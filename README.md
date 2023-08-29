@@ -1,146 +1,281 @@
 # Bharat-Intern-Task-3
 Number Recognition
 
-TASK: 3
-Number Recognition
-import keras
-from keras.datasets import mnist
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten
-from keras.layers import Conv2D, MaxPooling2D
-from keras import backend as K
-# the data, split between train and test sets
-(x_train, y_train), (x_test, y_test) = mnist.load_data()
-print(x_train.shape, y_train.shape)
-Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/mnist.npz
-11490434/11490434 [==============================] - 10s 1us/step
-(60000, 28, 28) (60000,)
-x_train = x_train.reshape(x_train.shape[0], 28, 28, 1)
-x_test = x_test.reshape(x_test.shape[0], 28, 28, 1)
-input_shape = (28, 28, 1)
+TASK 3: Number Recognition
+By Aluri Srihari Goud
 
-# convert class vectors to binary class matrices
-y_train = keras.utils.to_categorical(y_train)
-y_test = keras.utils.to_categorical(y_test)
+About Dataset
+MNIST is a commonly used dataset in machine learning and computer vision research, which consists of a set of 70,000 images of handwritten digits (0-9), each of size 28x28 pixels. The dataset is split into two sets: a training set of 60,000 images and a test set of 10,000 images. The training set is used to train a machine learning model, while the test set is used to evaluate the model's performance.
 
-x_train = x_train.astype('float32')
-x_test = x_test.astype('float32')
-x_train /= 255
-x_test /= 255
-print('x_train shape:', x_train.shape)
-print(x_train.shape[0], 'train samples')
-print(x_test.shape[0], 'test samples')
-x_train shape: (60000, 28, 28, 1)
-60000 train samples
-10000 test samples
-batch_size = 128
-num_classes = 10
-epochs = 10
-
-model = Sequential()
-model.add(Conv2D(32, kernel_size=(3, 3),activation='relu',input_shape=input_shape))
-model.add(Conv2D(64, (3, 3), activation='relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Dropout(0.25))
-model.add(Flatten())
-model.add(Dense(256, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(num_classes, activation='softmax'))
-
-model.compile(loss=keras.losses.categorical_crossentropy,optimizer=keras.optimizers.Adadelta(),metrics=['accuracy'])
-hist = model.fit(x_train, y_train,batch_size=batch_size,epochs=epochs,verbose=1,validation_data=(x_test, y_test))
-print("The model has successfully trained")
-
-model.save('mnist.h5')
-print("Saving the model as mnist.h5")
-Epoch 1/10
-469/469 [==============================] - 161s 340ms/step - loss: 2.2832 - accuracy: 0.1236 - val_loss: 2.2502 - val_accuracy: 0.2332
-Epoch 2/10
-469/469 [==============================] - 143s 304ms/step - loss: 2.2291 - accuracy: 0.2187 - val_loss: 2.1854 - val_accuracy: 0.3834
-Epoch 3/10
-469/469 [==============================] - 161s 343ms/step - loss: 2.1624 - accuracy: 0.3205 - val_loss: 2.1002 - val_accuracy: 0.4994
-Epoch 4/10
-469/469 [==============================] - 164s 351ms/step - loss: 2.0696 - accuracy: 0.4214 - val_loss: 1.9814 - val_accuracy: 0.6013
-Epoch 5/10
-469/469 [==============================] - 127s 272ms/step - loss: 1.9419 - accuracy: 0.5109 - val_loss: 1.8146 - val_accuracy: 0.6844
-Epoch 6/10
-469/469 [==============================] - 128s 273ms/step - loss: 1.7635 - accuracy: 0.5914 - val_loss: 1.5898 - val_accuracy: 0.7528
-Epoch 7/10
-469/469 [==============================] - 128s 273ms/step - loss: 1.5465 - accuracy: 0.6488 - val_loss: 1.3305 - val_accuracy: 0.7948
-Epoch 8/10
-469/469 [==============================] - 128s 273ms/step - loss: 1.3207 - accuracy: 0.6853 - val_loss: 1.0875 - val_accuracy: 0.8135
-Epoch 9/10
-469/469 [==============================] - 127s 272ms/step - loss: 1.1331 - accuracy: 0.7104 - val_loss: 0.8999 - val_accuracy: 0.8275
-Epoch 10/10
-469/469 [==============================] - 128s 272ms/step - loss: 0.9905 - accuracy: 0.7319 - val_loss: 0.7686 - val_accuracy: 0.8378
-The model has successfully trained
-Saving the model as mnist.h5
-score = model.evaluate(x_test, y_test, verbose=0)
-print('Test loss:', score[0])
-print('Test accuracy:', score[1])
-Test loss: 0.7686095833778381
-Test accuracy: 0.8378000259399414
-from keras.models import load_model
-from tkinter import *
-import tkinter as tk
-import win32gui
-from PIL import ImageGrab, Image
+# Importing Libraries
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from numpy import unique , argmax
 
-model = load_model('mnist.h5')
+# TensorFlow already contain MNIST data set which can be loaded using Keras
+import tensorflow as tf # installing tenserflow
+from tensorflow import keras
+# To Load the MNIST dataset from the Keras API provided by TensorFlow.
+mnist = tf.keras.datasets.mnist
+The Above Code Reflects that the Dataset Contains :
 
-def predict_digit(img):
-    #resize image to 28x28 pixels
-    img = img.resize((28,28))
-    #convert rgb to grayscale
-    img = img.convert('L')
-    img = np.array(img)
-    #reshaping to support our model input and normalizing
-    img = img.reshape(1,28,28,1)
-    img = img/255.0
-    #predicting the class
-    res = model.predict([img])[0]
-    return np.argmax(res), max(res)
+An array of 60,000 images, each represented as a 28x28 NumPy array, with pixel values ranging from 0 to 255.
+An array of 60,000 labels, each representing the correct digit (0-9) for the 1.
+An array of 10,000 images, each represented as a 28x28 NumPy array, with pixel values ranging from 0 to 255.
+An array of 10,000 labels, each representing the correct digit (0-9) for the 3.
+Dividing the data into train and test data.
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+print(x_train.shape)
+print(y_train.shape)
+print(x_test.shape)
+print(y_test.shape)
+(60000, 28, 28)
+(60000,)
+(10000, 28, 28)
+(10000,)
+print(x_train)
+[[[0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  ...
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]]
 
-class App(tk.Tk):
-    def __init__(self):
-        tk.Tk.__init__(self)
+ [[0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  ...
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]]
 
-        self.x = self.y = 0
+ [[0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  ...
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]]
 
-        # Creating elements
-        self.canvas = tk.Canvas(self, width=300, height=300, bg = "white", cursor="cross")
-        self.label = tk.Label(self, text="Thinking..", font=("Helvetica", 48))
-        self.classify_btn = tk.Button(self, text = "Recognise", command =         self.classify_handwriting) 
-        self.button_clear = tk.Button(self, text = "Clear", command = self.clear_all)
+ ...
 
-        # Grid structure
-        self.canvas.grid(row=0, column=0, pady=2, sticky=W, )
-        self.label.grid(row=0, column=1,pady=2, padx=2)
-        self.classify_btn.grid(row=1, column=1, pady=2, padx=2)
-        self.button_clear.grid(row=1, column=0, pady=2)
+ [[0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  ...
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]]
 
-        #self.canvas.bind("<Motion>", self.start_pos)
-        self.canvas.bind("<B1-Motion>", self.draw_lines)
+ [[0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  ...
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]]
 
-    def clear_all(self):
-        self.canvas.delete("all")
+ [[0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  ...
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]]]
+print(x_test)
+[[[0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  ...
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]]
 
-    def classify_handwriting(self):
-        HWND = self.canvas.winfo_id() # get the handle of the canvas
-        rect = win32gui.GetWindowRect(HWND) # get the coordinate of the canvas
-        im = ImageGrab.grab(rect)
+ [[0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  ...
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]]
 
-        digit, acc = predict_digit(im)
-        self.label.configure(text= str(digit)+', '+ str(int(acc*100))+'%')
+ [[0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  ...
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]]
 
-    def draw_lines(self, event):
-        self.x = event.x
-        self.y = event.y
-        r=8
-        self.canvas.create_oval(self.x-r, self.y-r, self.x + r, self.y + r, fill='black')
+ ...
 
-app = App()
-mainloop()
-1/1 [==============================] - 1s 566ms/step
-1/1 [==============================] - 0s 94ms/step
+ [[0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  ...
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]]
+
+ [[0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  ...
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]]
+
+ [[0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  ...
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]
+  [0 0 0 ... 0 0 0]]]
+# Reshaping the input Data which is used as a input in CNN in Tenserflow
+# CNN takes the input Data in 4D Format with the shape (num_samples, image_height, image_width, num_channels)
+# Here (num_channels) is set to 1 which means input image is Grayscale.
+
+x_train = x_train.reshape((x_train.shape[0] , x_train.shape[1] , x_train.shape[2],1))
+x_test = x_test.reshape((x_test.shape[0] , x_test.shape[1] , x_test.shape[2],1))
+print(x_train.shape)
+print(x_test.shape)
+print(x_train.dtype)
+print(x_test.dtype)
+(60000, 28, 28, 1)
+(10000, 28, 28, 1)
+uint8
+uint8
+# Normalizing Pixel Values
+
+x_train = x_train.astype('float32')/255.0
+x_test = x_test.astype('float32')/255.0
+print(x_train.dtype)
+print(x_test.dtype)
+float32
+float32
+# Visulaizing Subsets of images in MNIST Dataset along with coressponding labels.
+
+fig=plt.figure(figsize=(5,3))
+for i in range(20):
+    ax =fig.add_subplot(2,10,i+1, xticks=[], yticks=[])
+    ax.imshow(np.squeeze(x_train[i]), cmap='Blues')
+    ax.set_title(y_train[i])
+
+    ![image](https://github.com/srihari06/Bharat-Intern-Task-3/assets/119677889/8f812580-3c30-43b6-a45a-838de81b5734)
+
+    # showing shape of single image
+img_shape= x_train.shape[1:]
+img_shape
+(28, 28, 1)
+BUILDING NEURAL NETWORK THAT CAN READ HANDWRITTEN DIGITS.
+# Creating aSequential Model in Keras
+model = tf.keras.models.Sequential([
+    tf.keras.layers.Flatten(input_shape=(28, 28)),
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Dense(10)
+])
+model.summary()
+Model: "sequential_2"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ flatten_1 (Flatten)         (None, 784)               0         
+                                                                 
+ dense_2 (Dense)             (None, 128)               100480    
+                                                                 
+ dropout_1 (Dropout)         (None, 128)               0         
+                                                                 
+ dense_3 (Dense)             (None, 10)                1290      
+                                                                 
+=================================================================
+Total params: 101,770
+Trainable params: 101,770
+Non-trainable params: 0
+_________________________________________________________________
+This summary shows that the model has four layers:
+
+A Flatten layer that flattens the input images to a 1D array of length 784.
+A Dense layer with 128 units and ReLU activation.
+A Dropout layer that randomly sets 20% of the input units to 0 during training.
+A second Dense layer with 10 units and no activation function.
+The summary also shows the number of trainable parameters in each layer, as well as the total number of trainable parameters in the model. In this case, the model has a total of 101,770 trainable parameters.
+
+# Displaying Neural Network Model
+from tensorflow.keras.utils import plot_model
+plot_model(model, 'model.jpg', show_shapes = True)
+
+![image](https://github.com/srihari06/Bharat-Intern-Task-3/assets/119677889/e7bbc14f-6cf9-40e8-a076-e0a886c5f65f)
+
+# Making Prediction on Model
+prediction = model(x_train[:1]).numpy()
+prediction
+array([[ 0.08819406,  0.02334788,  0.05840464,  0.06903427,  0.5252824 ,
+        -0.04078927, -0.22387438, -0.43524188, -0.27941954, -0.03243962]],
+      dtype=float32)
+# Applying Softmax() Function to prediction array
+# This convert an output vector of real numbers into a probability distribution over predicted classes
+tf.nn.softmax(prediction).numpy()
+array([[0.10846904, 0.10165843, 0.10528546, 0.10641058, 0.16793098,
+        0.09534305, 0.07939189, 0.06426588, 0.07510229, 0.09614246]],
+      dtype=float32)
+loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+loss_fn(y_train[:1], prediction).numpy()
+model.compile(optimizer='adam',loss=loss_fn,metrics=['accuracy'])
+Model fitting
+# Training the Model
+model.fit(x_train, y_train, epochs=5)
+Epoch 1/5
+1875/1875 [==============================] - 8s 4ms/step - loss: 0.2960 - accuracy: 0.9140
+Epoch 2/5
+1875/1875 [==============================] - 6s 3ms/step - loss: 0.1439 - accuracy: 0.9571
+Epoch 3/5
+1875/1875 [==============================] - 7s 4ms/step - loss: 0.1089 - accuracy: 0.9672
+Epoch 4/5
+1875/1875 [==============================] - 6s 3ms/step - loss: 0.0890 - accuracy: 0.9727
+Epoch 5/5
+1875/1875 [==============================] - 7s 4ms/step - loss: 0.0757 - accuracy: 0.9764
+<keras.callbacks.History at 0x7f41a1286830>
+# Evaluating the Model
+model.evaluate(x_test, y_test, verbose=2)
+313/313 - 1s - loss: 0.0752 - accuracy: 0.9770 - 545ms/epoch - 2ms/step
+[0.07518018782138824, 0.9769999980926514]
+# Creating a new sequential model which includes both previously trained model and softmax layer.
+probability_model = tf.keras.Sequential([ model,tf.keras.layers.Softmax() ])
+probability_model(x_test[:5])
+<tf.Tensor: shape=(5, 10), dtype=float32, numpy=
+array([[1.5023636e-08, 2.8046278e-08, 8.6892478e-06, 2.1114422e-05,
+        8.8602803e-10, 4.8365621e-08, 6.1451641e-13, 9.9996769e-01,
+        2.8051858e-07, 2.1160774e-06],
+       [3.8681939e-08, 4.1496165e-05, 9.9991894e-01, 1.7614640e-05,
+        4.3373732e-15, 1.6626309e-05, 3.2137373e-06, 9.0283954e-13,
+        2.0866528e-06, 7.1583733e-13],
+       [3.7049006e-07, 9.9759489e-01, 1.6454932e-04, 5.1491074e-06,
+        3.9168852e-05, 6.7521983e-06, 4.3748798e-05, 1.8154874e-03,
+        3.2646983e-04, 3.4668781e-06],
+       [9.9989104e-01, 1.0030488e-07, 3.4515320e-05, 4.4909646e-07,
+        1.5330463e-05, 2.1342439e-06, 2.7114160e-05, 2.8521930e-05,
+        7.9536186e-08, 5.7907613e-07],
+       [4.1292051e-06, 6.2117507e-09, 5.1304491e-05, 1.7004332e-07,
+        9.9647850e-01, 4.2222570e-07, 3.9773659e-06, 8.5955893e-05,
+        2.9344408e-06, 3.3726362e-03]], dtype=float32)>
+# Displaying a Grayscale Image
+img = x_train[12]
+plt.imshow(np.squeeze(img) ,cmap='gray')
+plt.show()
+
+![image](https://github.com/srihari06/Bharat-Intern-Task-3/assets/119677889/8fdd8101-4572-4017-b81c-b94088986a34)
+
+# Predicting the Result
+img= img.reshape(1, img.shape[0],img.shape[1],img.shape[2])
+p= model.predict([img])
+print("predicted : {}".format(argmax(p)))
+1/1 [==============================] - 0s 55ms/step
+predicted : 3
+
+
+
