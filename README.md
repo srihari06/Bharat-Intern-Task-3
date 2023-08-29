@@ -166,7 +166,8 @@ for i in range(20):
     ax.imshow(np.squeeze(x_train[i]), cmap='Blues')
     ax.set_title(y_train[i])
 
-    ![image](https://github.com/srihari06/Bharat-Intern-Task-3/assets/119677889/8f812580-3c30-43b6-a45a-838de81b5734)
+  ![image](https://github.com/srihari06/Bharat-Intern-Task-3/assets/119677889/ac64bf9d-2974-4900-b2d9-7cab03c1723a)
+
 
     # showing shape of single image
 img_shape= x_train.shape[1:]
